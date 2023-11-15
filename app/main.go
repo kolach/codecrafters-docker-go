@@ -26,8 +26,8 @@ func main() {
 
 	cmd := exec.Command(command, args...)
 	cmd.Stdin = nullReader{}
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
+	cmd.Stderr = nullWriter{}
+	cmd.Stdout = nullWriter{}
 
 	if err := cmd.Run(); err != nil {
 		fmt.Printf("Err: %v", err)
