@@ -82,6 +82,10 @@ func main() {
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		Cloneflags: syscall.CLONE_NEWPID,
+	}
+
 	if err := cmd.Run(); err != nil {
 		fmt.Printf("Err: %v", err)
 		os.Exit(cmd.ProcessState.ExitCode())
