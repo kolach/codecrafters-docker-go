@@ -1,55 +1,31 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
+
+	"github.com/kolach/docker/pkg/dockerhub"
+	"github.com/kolach/docker/pkg/file"
 )
 
-func copyFile(src, dst string) error {
-	// Open the source file for reading
-	sourceFile, err := os.Open(src)
-	if err != nil {
-		return err
+func ParseImgAndVersion() (string, string) {
+	imgAndVersion := strings.SplitN(os.Args[2], ":", 2)
+	img := imgAndVersion[0]
+	ver := "latest"
+	if len(imgAndVersion) > 1 {
+		ver = imgAndVersion[1]
 	}
-	defer sourceFile.Close()
-
-	// Get the source file's permissions
-	sourceInfo, err := sourceFile.Stat()
-	if err != nil {
-		return err
-	}
-	sourcePerm := sourceInfo.Mode()
-
-	// Create the destination file for writing
-	destinationFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer destinationFile.Close()
-
-	// Copy the contents of the source file to the destination file
-	_, err = io.Copy(destinationFile, sourceFile)
-	if err != nil {
-		return err
-	}
-
-	// Set the destination file's permissions to match the source file
-	err = destinationFile.Chmod(sourcePerm)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return img, ver
 }
 
 // Usage: your_docker.sh run <image> <command> <arg1> <arg2> ...
 func main() {
-	command := os.Args[3]
-	args := os.Args[4:len(os.Args)]
+	ctx := context.Background()
 
 	// Create root of executable command
 	tempDir, err := os.MkdirTemp("", "mychroot")
@@ -57,6 +33,21 @@ func main() {
 		panic(err)
 	}
 	defer os.RemoveAll(tempDir)
+	fmt.Printf("Root directory: %s\n", tempDir)
+
+	img, ver := ParseImgAndVersion()
+	fmt.Printf("Image: %s, version/digest: %s\n", img, ver)
+
+	// pull image into tempDir
+	if err := dockerhub.PullImage(ctx, img, ver, tempDir); err != nil {
+		panic(err)
+	}
+
+	command := os.Args[3]
+	args := os.Args[4:len(os.Args)]
+
+	fmt.Println("Command is: ", command)
+	fmt.Println("Command args are: ", args)
 
 	commandInChroot := filepath.Join(tempDir, filepath.Base(command))
 
@@ -66,7 +57,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := copyFile(command, commandInChroot); err != nil {
+	if err := file.Copy(command, commandInChroot); err != nil {
 		panic(err)
 	}
 
@@ -76,8 +67,8 @@ func main() {
 	}
 
 	commandInChroot = filepath.Join("/", filepath.Base(command))
-
 	cmd := exec.Command(commandInChroot, args...)
+
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
