@@ -1,4 +1,4 @@
-package dockerhub
+package hub
 
 import (
 	"context"
@@ -30,8 +30,6 @@ func getManifestList(ctx context.Context, token, img, ver string) (*manifestList
 		return nil, fmt.Errorf("failed to read image manifest body: %w", err)
 	}
 
-	// fmt.Printf("Got response body: %s\n\n", string(body))
-
 	var manifest manifestList
 	if err := json.Unmarshal(body, &manifest); err != nil {
 		return nil, fmt.Errorf("could not parse image manifest: %w", err)
@@ -43,11 +41,6 @@ func getManifestList(ctx context.Context, token, img, ver string) (*manifestList
 func findRuntimeMeta(list *manifestList) (*manifestMeta, error) {
 	for _, m := range list.Manifests {
 		if m.Platform.Os == runtime.GOOS && m.Platform.Architecture == runtime.GOARCH {
-			// fmt.Printf(
-			// 	"Found manifest for OS: %s, ARCH: %s\n",
-			// 	m.Platform.Os,
-			// 	m.Platform.Architecture,
-			// )
 			return m, nil
 		}
 	}
@@ -78,8 +71,6 @@ func getManifestByMetadata(
 	if err != nil {
 		return nil, fmt.Errorf("failed to read image manifest body: %w", err)
 	}
-
-	// fmt.Printf("Got response body: %s\n\n", string(body))
 
 	var manifest manifest
 	if err := json.Unmarshal(body, &manifest); err != nil {

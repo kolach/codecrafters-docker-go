@@ -8,7 +8,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/kolach/docker/pkg/dockerhub"
+	"github.com/kolach/docker/hub"
 )
 
 func parseImgAndVersion() (string, string) {
@@ -35,7 +35,7 @@ func main() {
 	img, ver := parseImgAndVersion()
 
 	// pull image into tempDir
-	if err := dockerhub.PullImage(ctx, img, ver, tempDir); err != nil {
+	if err := hub.PullImage(ctx, img, ver, tempDir); err != nil {
 		panic(err)
 	}
 

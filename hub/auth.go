@@ -1,4 +1,4 @@
-package dockerhub
+package hub
 
 import (
 	"context"

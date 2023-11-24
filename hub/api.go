@@ -1,4 +1,4 @@
-package dockerhub
+package hub
 
 const (
 	tokenURL    = "https://auth.docker.io/token?service=registry.docker.io&scope=repository:library/%s:pull"
