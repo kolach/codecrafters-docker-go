@@ -42,15 +42,6 @@ func main() {
 	command := os.Args[3]
 	args := os.Args[4:len(os.Args)]
 
-	// fmt.Println("Command is: ", command)
-	// fmt.Println("Command args are: ", args)
-
-	// Copy the binary command to the new root.
-	command, err = exec.LookPath(command)
-	if err != nil {
-		panic(err)
-	}
-
 	// Enter the chroot.
 	if err := syscall.Chroot(tempDir); err != nil {
 		panic(err)
