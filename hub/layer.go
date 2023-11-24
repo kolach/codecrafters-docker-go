@@ -10,7 +10,11 @@ import (
 	"path/filepath"
 )
 
-func pullLayer(
+const (
+	layerURL = "https://registry.hub.docker.com/v2/library/%s/blobs/%s"
+)
+
+func getLayer(
 	ctx context.Context,
 	token, img, digest string,
 ) (io.ReadCloser, error) {
@@ -34,14 +38,6 @@ func pullLayer(
 	return res.Body, nil
 }
 
-func pullAndStoreLayer(ctx context.Context, token, img, digest, targetDir string) (string, error) {
-	layerReader, err := pullLayer(ctx, token, img, digest)
-	if err != nil {
-		return "", err
-	}
-	return storeLayer(layerReader, digest, targetDir)
-}
-
 func storeLayer(r io.ReadCloser, digest string, targetDir string) (string, error) {
 	defer r.Close()
 
@@ -58,7 +54,15 @@ func storeLayer(r io.ReadCloser, digest string, targetDir string) (string, error
 	return filename, nil
 }
 
-func unpackLayerFromFile(filename string, targetDir string) error {
+func PullLayer(ctx context.Context, token, img, digest, targetDir string) (string, error) {
+	layerReader, err := getLayer(ctx, token, img, digest)
+	if err != nil {
+		return "", err
+	}
+	return storeLayer(layerReader, digest, targetDir)
+}
+
+func UnpackLayer(filename string, targetDir string) error {
 	cmd := exec.Command("tar", "-xzf", filename, "-C", targetDir)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
