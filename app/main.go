@@ -11,7 +11,7 @@ import (
 	"github.com/kolach/docker/pkg/dockerhub"
 )
 
-func ParseImgAndVersion() (string, string) {
+func parseImgAndVersion() (string, string) {
 	imgAndVersion := strings.SplitN(os.Args[2], ":", 2)
 	img := imgAndVersion[0]
 	ver := "latest"
@@ -32,7 +32,7 @@ func main() {
 	}
 	defer os.RemoveAll(tempDir)
 
-	img, ver := ParseImgAndVersion()
+	img, ver := parseImgAndVersion()
 
 	// pull image into tempDir
 	if err := dockerhub.PullImage(ctx, img, ver, tempDir); err != nil {

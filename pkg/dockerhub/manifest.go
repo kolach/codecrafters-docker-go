@@ -9,7 +9,7 @@ import (
 	"runtime"
 )
 
-func getManifestList(ctx context.Context, token, img, ver string) (*ManifestList, error) {
+func getManifestList(ctx context.Context, token, img, ver string) (*manifestList, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf(manifestURL, img, ver), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make request: %w", err)
@@ -32,7 +32,7 @@ func getManifestList(ctx context.Context, token, img, ver string) (*ManifestList
 
 	// fmt.Printf("Got response body: %s\n\n", string(body))
 
-	var manifest ManifestList
+	var manifest manifestList
 	if err := json.Unmarshal(body, &manifest); err != nil {
 		return nil, fmt.Errorf("could not parse image manifest: %w", err)
 	}
@@ -40,7 +40,7 @@ func getManifestList(ctx context.Context, token, img, ver string) (*ManifestList
 	return &manifest, nil
 }
 
-func findRuntimeMeta(list *ManifestList) (*ManifestMeta, error) {
+func findRuntimeMeta(list *manifestList) (*manifestMeta, error) {
 	for _, m := range list.Manifests {
 		if m.Platform.Os == runtime.GOOS && m.Platform.Architecture == runtime.GOARCH {
 			// fmt.Printf(
@@ -57,8 +57,8 @@ func findRuntimeMeta(list *ManifestList) (*ManifestMeta, error) {
 func getManifestByMetadata(
 	ctx context.Context,
 	token, img string,
-	meta *ManifestMeta,
-) (*Manifest, error) {
+	meta *manifestMeta,
+) (*manifest, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf(manifestURL, img, meta.Digest), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make manifest request: %w", err)
@@ -81,7 +81,7 @@ func getManifestByMetadata(
 
 	// fmt.Printf("Got response body: %s\n\n", string(body))
 
-	var manifest Manifest
+	var manifest manifest
 	if err := json.Unmarshal(body, &manifest); err != nil {
 		return nil, fmt.Errorf("could not parse image manifest: %w", err)
 	}
@@ -89,7 +89,7 @@ func getManifestByMetadata(
 	return &manifest, nil
 }
 
-func getManifest(ctx context.Context, token, img, ver string) (*Manifest, error) {
+func getManifest(ctx context.Context, token, img, ver string) (*manifest, error) {
 	// Get manifest list
 	list, err := getManifestList(ctx, token, img, ver)
 	if err != nil {

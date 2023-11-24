@@ -12,7 +12,7 @@ type tokenResponse struct {
 	Token string `json:"token"`
 }
 
-type ManifestMeta struct {
+type manifestMeta struct {
 	MediaType string `json:"mediaType"`
 	Size      int    `json:"size"`
 	Digest    string `json:"digest"`
@@ -22,13 +22,13 @@ type ManifestMeta struct {
 	} `json:"platform"`
 }
 
-type ManifestList struct {
+type manifestList struct {
 	SchemaVersion int             `json:"schemaVersion"`
 	MediaType     string          `json:"mediaType"`
-	Manifests     []*ManifestMeta `json:"manifests"`
+	Manifests     []*manifestMeta `json:"manifests"`
 }
 
-type Manifest struct {
+type manifest struct {
 	SchemaVersion int    `json:"schemaVersion"`
 	MediaType     string `json:"mediaType"`
 	Config        struct {
@@ -42,17 +42,3 @@ type Manifest struct {
 		Digest    string `json:"digest"`
 	} `json:"layers"`
 }
-
-type User struct{}
-
-type UserDataGetter interface {
-	GetUser(id int) User
-}
-
-type UserGetter struct{}
-
-func (UserGetter) GetUser(id int) User {
-	return User{}
-}
-
-var _ UserDataGetter = (*UserGetter)(nil)
