@@ -21,6 +21,8 @@ func parallelPull(
 	dlDone := make(chan dlRes, len(man.Layers))
 
 	go func() {
+		pullCtx, cancel := context.WithCancel(ctx)
+		defer cancel()
 		var wg sync.WaitGroup
 
 		for _, layer := range man.Layers {
@@ -29,9 +31,10 @@ func parallelPull(
 			go func() {
 				defer wg.Done()
 
-				layerFile, err := pullAndStoreLayer(ctx, token, img, layer.Digest, targetDir)
+				layerFile, err := pullAndStoreLayer(pullCtx, token, img, layer.Digest, targetDir)
 				if err != nil {
 					errChan <- err
+					cancel()
 				} else {
 					dlDone <- dlRes{digest: layer.Digest, path: layerFile}
 				}
