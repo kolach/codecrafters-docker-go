@@ -32,10 +32,7 @@ func main() {
 	}
 	defer os.RemoveAll(tempDir)
 
-	fmt.Printf("Root directory: %s\n", tempDir)
-
 	img, ver := ParseImgAndVersion()
-	fmt.Printf("Image: %s, version/digest: %s\n", img, ver)
 
 	// pull image into tempDir
 	if err := dockerhub.PullImage(ctx, img, ver, tempDir); err != nil {
@@ -45,8 +42,8 @@ func main() {
 	command := os.Args[3]
 	args := os.Args[4:len(os.Args)]
 
-	fmt.Println("Command is: ", command)
-	fmt.Println("Command args are: ", args)
+	// fmt.Println("Command is: ", command)
+	// fmt.Println("Command args are: ", args)
 
 	// Copy the binary command to the new root.
 	command, err = exec.LookPath(command)

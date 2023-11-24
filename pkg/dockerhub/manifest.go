@@ -43,11 +43,11 @@ func getManifestList(ctx context.Context, token, img, ver string) (*ManifestList
 func findRuntimeMeta(list *ManifestList) (*ManifestMeta, error) {
 	for _, m := range list.Manifests {
 		if m.Platform.Os == runtime.GOOS && m.Platform.Architecture == runtime.GOARCH {
-			fmt.Printf(
-				"Found manifest for OS: %s, ARCH: %s\n",
-				m.Platform.Os,
-				m.Platform.Architecture,
-			)
+			// fmt.Printf(
+			// 	"Found manifest for OS: %s, ARCH: %s\n",
+			// 	m.Platform.Os,
+			// 	m.Platform.Architecture,
+			// )
 			return m, nil
 		}
 	}

@@ -25,10 +25,8 @@ func PullImage(ctx context.Context, img, ver, targetDir string) error {
 		return fmt.Errorf("failed to create temp directory for layers: %w", err)
 	}
 	defer os.RemoveAll(layersDir)
-	fmt.Printf("Layers directory: %s\n", layersDir)
 
 	for _, layer := range manifest.Layers {
-		fmt.Println("Pulling layer: ", layer.Digest)
 		layerReader, err := pullLayer(ctx, token, img, layer.Digest)
 		if err != nil {
 			return err
@@ -39,7 +37,6 @@ func PullImage(ctx context.Context, img, ver, targetDir string) error {
 			return err
 		}
 
-		fmt.Printf("Unpacking layer: %s from file: %s\n", layer.Digest, layerFile)
 		if err := unpackLayerFromFile(layerFile, targetDir); err != nil {
 			return err
 		}
