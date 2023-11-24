@@ -28,7 +28,8 @@ func main() {
 	// Create root of executable command
 	tempDir, err := os.MkdirTemp("", "mychroot")
 	if err != nil {
-		panic(err)
+		fmt.Printf("Failed to make temporal directory: %v", err)
+		os.Exit(1)
 	}
 	defer os.RemoveAll(tempDir)
 
@@ -36,7 +37,8 @@ func main() {
 
 	// pull image into tempDir
 	if err := hub.PullImage(ctx, img, ver, tempDir); err != nil {
-		panic(err)
+		fmt.Printf("Failed to pull image: %v", err)
+		os.Exit(1)
 	}
 
 	command := os.Args[3]
@@ -44,7 +46,8 @@ func main() {
 
 	// Enter the chroot.
 	if err := syscall.Chroot(tempDir); err != nil {
-		panic(err)
+		fmt.Printf("Failed to chroot: %v", err)
+		os.Exit(1)
 	}
 
 	cmd := exec.Command(command, args...)
