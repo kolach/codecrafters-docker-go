@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"syscall"
 
 	"github.com/kolach/docker/pkg/dockerhub"
-	"github.com/kolach/docker/pkg/file"
 )
 
 func ParseImgAndVersion() (string, string) {
@@ -33,6 +31,7 @@ func main() {
 		panic(err)
 	}
 	defer os.RemoveAll(tempDir)
+
 	fmt.Printf("Root directory: %s\n", tempDir)
 
 	img, ver := ParseImgAndVersion()
@@ -49,15 +48,9 @@ func main() {
 	fmt.Println("Command is: ", command)
 	fmt.Println("Command args are: ", args)
 
-	commandInChroot := filepath.Join(tempDir, filepath.Base(command))
-
 	// Copy the binary command to the new root.
 	command, err = exec.LookPath(command)
 	if err != nil {
-		panic(err)
-	}
-
-	if err := file.Copy(command, commandInChroot); err != nil {
 		panic(err)
 	}
 
@@ -66,8 +59,7 @@ func main() {
 		panic(err)
 	}
 
-	commandInChroot = filepath.Join("/", filepath.Base(command))
-	cmd := exec.Command(commandInChroot, args...)
+	cmd := exec.Command(command, args...)
 
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
