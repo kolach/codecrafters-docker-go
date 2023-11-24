@@ -34,6 +34,14 @@ func pullLayer(
 	return res.Body, nil
 }
 
+func pullAndStoreLayer(ctx context.Context, token, img, digest, targetDir string) (string, error) {
+	layerReader, err := pullLayer(ctx, token, img, digest)
+	if err != nil {
+		return "", err
+	}
+	return storeLayer(layerReader, digest, targetDir)
+}
+
 func storeLayer(r io.ReadCloser, digest string, targetDir string) (string, error) {
 	defer r.Close()
 

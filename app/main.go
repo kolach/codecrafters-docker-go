@@ -36,7 +36,7 @@ func main() {
 	img, ver := parseImgAndVersion()
 
 	// pull image into tempDir
-	if err := hub.PullImage(ctx, img, ver, tempDir); err != nil {
+	if err := hub.PullImage2(ctx, img, ver, tempDir); err != nil {
 		fmt.Printf("Failed to pull image: %v", err)
 		os.Exit(1)
 	}
